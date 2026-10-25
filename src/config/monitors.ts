@@ -17,3 +17,6 @@ export const monitors: Monitor[] = [
     headers: { "ngrok-skip-browser-warning": "true" },
   },
 ];
+
+/** Monitors with a real URL; placeholders (url "TODO") are kept in the config but skipped everywhere. */
+export const activeMonitors = monitors.filter((m) => m.url !== "TODO");

@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { connection } from "next/server";
-import { monitors as allMonitors, type Monitor } from "@/config/monitors";
+import { activeMonitors as monitors, type Monitor } from "@/config/monitors";
 import { connectDB } from "@/lib/db";
 import { runCheck, type CheckResult } from "@/lib/check";
 import { downMessage, pushLine, recoveredMessage } from "@/lib/line";
@@ -8,9 +8,6 @@ import { nextState } from "@/lib/state";
 import { Check } from "@/models/Check";
 import { Incident } from "@/models/Incident";
 import { MonitorState } from "@/models/MonitorState";
-
-// Placeholder monitors (url "TODO") stay in the config but are not checked, saved, or alerted on.
-const monitors = allMonitors.filter((m) => m.url !== "TODO");
 
 const sha256 = (s: string) => createHash("sha256").update(s).digest();
 
