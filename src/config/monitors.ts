@@ -8,8 +8,8 @@ export type Monitor = {
 
 export const monitors: Monitor[] = [
   { id: "mini-jira", name: "Mini Jira", url: "https://mini-jira-tan.vercel.app/login" },
-  { id: "portfolio", name: "Portfolio", url: "TODO" },
-  { id: "pomodoro", name: "Pomodoro", url: "TODO" },
+  { id: "portfolio", name: "Portfolio", url: "https://portfolio-xanax.vercel.app/" },
+  { id: "pomodoro", name: "Pomodoro", url: "https://pomodoro-webapp-870c6.web.app/" },
   {
     id: "n8n",
     name: "n8n (self-hosted)",
