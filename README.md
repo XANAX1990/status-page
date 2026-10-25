@@ -2,8 +2,10 @@
 
 A personal uptime monitor and public status page for the things I run: Mini Jira, my portfolio, my Pomodoro app, and my self-hosted n8n. It checks each service every 5 minutes, records response times, opens and closes incidents automatically, and sends a LINE alert when something goes down or comes back.
 
-> **Status:** in development. See [`PLAN.md`](./PLAN.md) for the roadmap and current progress.
-> **Live:** _add the Vercel link after Phase 5_
+> **Status:** live and monitoring. See [`PLAN.md`](./PLAN.md) for the build plan.
+> **Live:** https://status-page-xan.vercel.app/
+
+![Status page](./docs/screenshot.png)
 
 ---
 
@@ -15,12 +17,12 @@ My n8n instance runs on my own PC behind ngrok, so it goes down every time I shu
 
 | Feature | Status |
 |---|---|
-| HTTP checks every 5 minutes (status code + timeout) | ⏳ Planned |
-| Response time history, p50 / p95 latency | ⏳ Planned |
-| Uptime % for 24h / 7d / 30d, 90-day history bars | ⏳ Planned |
-| Automatic incidents (down after 2 failed checks in a row, resolved on recovery) | ⏳ Planned |
-| LINE alert on down and on recovery | ⏳ Planned |
-| Public status page (names only, no internal URLs) | ⏳ Planned |
+| HTTP checks every 5 minutes (status code + timeout) | ✅ Done |
+| 24h response-time chart, p95 latency | ✅ Done |
+| Uptime % for 24h / 7d / 30d, 90-day history bars | ✅ Done |
+| Automatic incidents (down after 2 failed checks in a row, resolved on recovery) | ✅ Done |
+| LINE alert on down and on recovery | ✅ Done |
+| Public status page (names only, no internal URLs) | ✅ Done |
 
 ## Architecture
 
@@ -83,7 +85,7 @@ curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron/che
 |---|---|
 | `MONGODB_URI` | Atlas connection string, database name `/status-page` before `?` |
 | `CRON_SECRET` | Random string; the cron endpoint rejects requests without it (`openssl rand -hex 32`) |
-| `LINE_CHANNEL_TOKEN` | Channel access token of the LINE OA that sends alerts |
+| `LINE_CHANNEL_ACCESS_TOKEN` | Channel access token of the LINE OA that sends alerts |
 | `LINE_USER_ID` | My LINE user ID **for that OA's provider** |
 
 Never commit `.env.local`.
@@ -103,7 +105,7 @@ src/
 │  ├─ stats.ts                  # uptime %, percentiles, daily buckets (pure)
 │  └─ line.ts                   # push message
 ├─ models/                      # Check, MonitorState, Incident
-└─ components/                  # StatusBanner, MonitorRow, UptimeBars, LatencyChart, IncidentList
+└─ components/                  # UptimeBars, LatencyChart, RelativeTime
 ```
 
 ## License
