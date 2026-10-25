@@ -9,7 +9,7 @@ const CheckSchema = new Schema({
   error: String,
 });
 
-CheckSchema.index({ at: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 30 });
+CheckSchema.index({ at: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 90 });
 CheckSchema.index({ monitorId: 1, at: 1 });
 
 export type CheckDoc = InferSchemaType<typeof CheckSchema>;

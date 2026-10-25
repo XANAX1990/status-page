@@ -40,7 +40,7 @@ export const monitors: Monitor[] = [
 
 - [ ] `create-next-app` (TypeScript, Tailwind, App Router, ESLint, `src/`), add Mongoose, Zod, Vitest
 - [ ] `src/lib/db.ts`: cached Mongoose connection on `globalThis` (same pattern as Mini Jira), throws if `MONGODB_URI` is missing
-- [ ] Models: `Check` (TTL index on `at`, 30 days; index `{ monitorId, at }`), `MonitorState` (unique `monitorId`), `Incident` (index `{ monitorId, startedAt }`)
+- [ ] Models: `Check` (TTL index on `at`, 90 days; index `{ monitorId, at }`), `MonitorState` (unique `monitorId`), `Incident` (index `{ monitorId, startedAt }`)
 - [ ] `src/config/monitors.ts` as above
 - [ ] `.env.example` with the 4 variable names (no values)
 - [ ] `CLAUDE.md` (`@AGENTS.md`, `@PLAN.md`, LESSONS rule) + empty `LESSONS.md`

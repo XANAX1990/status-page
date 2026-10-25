@@ -30,7 +30,7 @@ cron-job.org (every 5 min)
       ▼
 Next.js route handler on Vercel
       ├─ check all monitors in parallel (10s timeout each)
-      ├─ save one Check per monitor          → MongoDB (TTL 30 days)
+      ├─ save one Check per monitor          → MongoDB (TTL 90 days)
       ├─ run the state machine per monitor   → open / resolve Incident
       └─ on state change → LINE push (direct to the Messaging API)
 
@@ -45,7 +45,7 @@ Browser ──► status page (Server Component, revalidated every 60s)
 ## Data model
 
 ```ts
-Check         { monitorId, at, ok, statusCode?, latencyMs?, error? }   // TTL index: deleted after 30 days
+Check         { monitorId, at, ok, statusCode?, latencyMs?, error? }   // TTL index: deleted after 90 days
 MonitorState  { monitorId (unique), status: "up" | "down", consecutiveFails, lastCheckedAt }
 Incident      { monitorId, startedAt, resolvedAt?, cause }
 ```
@@ -57,7 +57,7 @@ Monitors themselves live in `src/config/monitors.ts`, not in the database. Addin
 - **Down means 2 failures in a row.** One timeout is often just a blip. Requiring two consecutive failures stops alert spam while still catching real outages within about 10 minutes.
 - **Alert only on state changes.** One message when a service goes down and one when it recovers. This also keeps well under LINE's free push quota.
 - **The state machine is a pure function.** `nextState(prev, result)` takes the previous state and one check result and returns the new state plus what happened (`opened` / `resolved` / `none`). It has no I/O, so it's fully unit tested.
-- **Old checks expire automatically.** A MongoDB TTL index deletes checks after 30 days, so storage stays small without a cleanup job.
+- **Old checks expire automatically.** A MongoDB TTL index deletes checks after 90 days, so storage stays small without a cleanup job.
 - **No internal URLs on the public page.** The page shows service names only. My ngrok URL stays private.
 - **No admin UI, no auth.** The page is read-only and monitors come from a config file, so there's nothing to log in to.
 
