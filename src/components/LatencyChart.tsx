@@ -5,15 +5,6 @@ const H = 64;
 const PAD_TOP = 4;
 const PAD_BOTTOM = 8; // room for the failed-check ticks
 
-function bangkokHour(t: number): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Bangkok",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(t);
-}
-
 export function LatencyChart({ series, name }: { series: SeriesPoint[]; name: string }) {
   const values = series.map((p) => p.ms).filter((v): v is number => v !== null);
   const failed = series.filter((p) => p.failed).length;
@@ -36,8 +27,6 @@ export function LatencyChart({ series, name }: { series: SeriesPoint[]; name: st
     }
   });
 
-  const first = series[0].t;
-  const last = series[series.length - 1].t;
 
   return (
     <figure className="m-0">
@@ -82,9 +71,9 @@ export function LatencyChart({ series, name }: { series: SeriesPoint[]; name: st
         )}
       </svg>
       <figcaption className="mt-1 flex justify-between text-xs text-muted">
-        <span>{bangkokHour(first)}</span>
+        <span>24h ago</span>
         <span>{values.length ? `peak ${max} ms` : ""}{failed ? ` · ${failed} failed` : ""}</span>
-        <span>{bangkokHour(last)}</span>
+        <span>now</span>
       </figcaption>
     </figure>
   );
