@@ -23,13 +23,15 @@ function bangkok(ts: number): string {
 
 const pct = (v: number | null) => (v === null ? "–" : `${v.toFixed(v === 100 ? 0 : 2)}%`);
 
-function StatusPill({ state }: { state: MonitorView["state"] }) {
+function StatusPill({ state, bestEffort }: { state: MonitorView["state"]; bestEffort: boolean }) {
   const map = {
     up: { label: "Operational", dot: "bg-up" },
     down: { label: "Down", dot: "bg-down" },
+    // Best-effort services that are down show a neutral note, not a red Down.
+    note: { label: "Runs on my home PC", dot: "bg-muted" },
     none: { label: "No data", dot: "bg-border" },
   } as const;
-  const s = map[state ?? "none"];
+  const s = map[state === "down" && bestEffort ? "note" : (state ?? "none")];
   return (
     <span className="flex items-center gap-2 text-sm">
       <span className={`inline-block size-2.5 rounded-full ${s.dot}`} aria-hidden />
@@ -52,7 +54,7 @@ function MonitorCard({ m }: { m: MonitorView }) {
     <li className="rounded-xl border border-border bg-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="m-0 min-w-0 truncate text-base font-medium">{m.name}</h3>
-        <StatusPill state={m.state} />
+        <StatusPill state={m.state} bestEffort={m.bestEffort} />
       </div>
       <dl className="m-0 mt-3 grid grid-cols-4 gap-2">
         <Stat label="24h" value={pct(m.uptime24h)} />

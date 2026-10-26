@@ -4,6 +4,7 @@ export type Monitor = {
   url: string; // never sent to the client
   expectStatus?: number[]; // default [200]; e.g. [200, 307] for a redirecting home page
   headers?: Record<string, string>;
+  bestEffort?: boolean; // still checked and alerted on, but excluded from the overall banner
 };
 
 export const monitors: Monitor[] = [
@@ -15,6 +16,7 @@ export const monitors: Monitor[] = [
     name: "n8n (self-hosted)",
     url: "https://your-ngrok-domain.example/healthz",
     headers: { "ngrok-skip-browser-warning": "true" },
+    bestEffort: true,
   },
 ];
 

@@ -24,6 +24,7 @@ const HISTORY_DAYS = 90;
 export type MonitorView = {
   id: string;
   name: string;
+  bestEffort: boolean;
   state: "up" | "down" | undefined;
   uptime24h: number | null;
   uptime7d: number | null;
@@ -87,6 +88,7 @@ export async function getStatusData(): Promise<StatusData> {
     return {
       id: m.id,
       name: m.name,
+      bestEffort: m.bestEffort ?? false,
       state: stateById.get(m.id),
       uptime24h: uptimePct(points, now, DAY),
       uptime7d: uptimePct(points, now, 7 * DAY),
@@ -107,7 +109,7 @@ export async function getStatusData(): Promise<StatusData> {
 
   return {
     generatedAt: now,
-    overall: overallStatus(monitors.map((m) => m.state)),
+    overall: overallStatus(monitors.filter((m) => !m.bestEffort).map((m) => m.state)),
     lastCheckedAt,
     monitors,
     openIncidents: open.map(toView),
