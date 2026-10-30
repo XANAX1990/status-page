@@ -25,6 +25,7 @@ Security rules and audit checklist for the Status Page (Next.js 16 on Vercel, Mo
 - [ ] Monitors come only from the config file, never from user input (so the checker can't be turned into an SSRF tool).
 - [ ] Checks use a timeout and `redirect: "manual"`; response bodies are not stored.
 - [ ] The public page is read-only: no forms, no write endpoints.
+- [ ] Security headers in `next.config` on every response: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `frame-ancestors 'none'` (plus `X-Frame-Options: DENY`), `Permissions-Policy`. Covered by `src/security-headers.test.ts`.
 - [ ] Alerts are sent only on state changes (no spam) and contain the service name, not the URL.
 - [ ] The DB user can only read/write the `status-page` database.
 - [ ] A failed LINE push is logged without the token.
