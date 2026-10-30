@@ -14,7 +14,9 @@ export const monitors: Monitor[] = [
   {
     id: "n8n",
     name: "n8n (self-hosted)",
-    url: "https://your-ngrok-domain.example/healthz",
+    // The address of my PC's tunnel must stay out of this (public) repo: it comes from the host's
+    // env settings. Unset behaves like a "TODO" placeholder, so the monitor is skipped everywhere.
+    url: process.env.N8N_HEALTH_URL?.trim() || "TODO",
     headers: { "ngrok-skip-browser-warning": "true" },
     bestEffort: true,
   },
@@ -22,3 +24,8 @@ export const monitors: Monitor[] = [
 
 /** Monitors with a real URL; placeholders (url "TODO") are kept in the config but skipped everywhere. */
 export const activeMonitors = monitors.filter((m) => m.url !== "TODO");
+
+if (process.env.NODE_ENV === "production" && !activeMonitors.some((m) => m.id === "n8n")) {
+  // Without this, forgetting the env var on the host would silently stop the n8n checks.
+  console.warn("N8N_HEALTH_URL is not set: the n8n monitor is skipped");
+}

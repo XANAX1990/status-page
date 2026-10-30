@@ -29,7 +29,7 @@ export const monitors: Monitor[] = [
   { id: "portfolio", name: "Portfolio", url: "TODO" },
   { id: "pomodoro",  name: "Pomodoro",  url: "TODO" },
   { id: "n8n",       name: "n8n (self-hosted)",
-    url: "https://your-ngrok-domain.example/healthz",
+    url: process.env.N8N_HEALTH_URL ?? "TODO",  // tunnel address: host env only, never committed
     headers: { "ngrok-skip-browser-warning": "true" } },
 ];
 ```

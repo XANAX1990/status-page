@@ -52,7 +52,7 @@ MonitorState  { monitorId (unique), status: "up" | "down", consecutiveFails, las
 Incident      { monitorId, startedAt, resolvedAt?, cause }
 ```
 
-Monitors themselves live in `src/config/monitors.ts`, not in the database. Adding a service means adding one object and pushing.
+Monitors themselves live in `src/config/monitors.ts`, not in the database. Adding a service means adding one object and pushing. The one exception is the n8n monitor: its address is the tunnel to my home PC, so it is read from the `N8N_HEALTH_URL` environment variable and never committed (unset means the monitor is skipped).
 
 ## Design decisions
 
@@ -87,6 +87,7 @@ curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron/che
 | `CRON_SECRET` | Random string; the cron endpoint rejects requests without it (`openssl rand -hex 32`) |
 | `LINE_CHANNEL_ACCESS_TOKEN` | Channel access token of the LINE OA that sends alerts |
 | `LINE_USER_ID` | My LINE user ID **for that OA's provider** |
+| `N8N_HEALTH_URL` | Full health-check URL of the self-hosted n8n (not committed; if unset, the n8n monitor is skipped) |
 
 Never commit `.env.local`.
 
