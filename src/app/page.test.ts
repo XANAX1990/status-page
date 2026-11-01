@@ -51,4 +51,43 @@ describe("status page", () => {
     expect(html).not.toContain("No checks recorded yet");
     expect(html).not.toContain("Status data unavailable");
   });
+
+  describe("stale data notice", () => {
+    const MIN = 60_000;
+    const GENERATED = Date.UTC(2026, 10, 1, 12, 0, 0);
+    const withLastCheck = (minutesOld: number | null) =>
+      render({
+        ok: true,
+        data: emptyData({
+          overall: "operational",
+          generatedAt: GENERATED,
+          lastCheckedAt: minutesOld === null ? null : GENERATED - minutesOld * MIN,
+        }),
+      });
+
+    it("shows how old the data is when no check came in for over 30 minutes", async () => {
+      const html = await withLastCheck(45);
+      expect(html).toContain("ข้อมูลล่าสุดเมื่อ 45 นาทีที่แล้ว");
+    });
+
+    it("keeps the rest of the page: the notice warns, it does not replace the banner", async () => {
+      const html = await withLastCheck(45);
+      expect(html).toContain("All systems operational");
+    });
+
+    it("shows nothing extra when the data is fresh", async () => {
+      expect(await withLastCheck(5)).not.toContain("ข้อมูลล่าสุดเมื่อ");
+      expect(await withLastCheck(30)).not.toContain("ข้อมูลล่าสุดเมื่อ");
+    });
+
+    it("does not call it stale when there are no checks at all", async () => {
+      const html = await withLastCheck(null);
+      expect(html).toContain("No checks recorded yet");
+      expect(html).not.toContain("ข้อมูลล่าสุดเมื่อ");
+    });
+
+    it("does not show it on the error page either", async () => {
+      expect(await render({ ok: false })).not.toContain("ข้อมูลล่าสุดเมื่อ");
+    });
+  });
 });

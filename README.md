@@ -23,6 +23,8 @@ My n8n instance runs on my own PC behind ngrok, so it goes down every time I shu
 | Automatic incidents (down after 2 failed checks in a row, resolved on recovery) | ✅ Done |
 | LINE alert on down and on recovery | ✅ Done |
 | Public status page (names only, no internal URLs) | ✅ Done |
+| Warning strip when the newest check is over 30 minutes old (so a stalled cron can't hide behind a green banner) | ✅ Done |
+| Error panel, not an empty page, when the database can't be read | ✅ Done |
 
 ## Architecture
 

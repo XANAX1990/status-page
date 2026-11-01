@@ -1,5 +1,6 @@
 import { LatencyChart } from "@/components/LatencyChart";
 import { RelativeTime } from "@/components/RelativeTime";
+import { StaleNotice } from "@/components/StaleNotice";
 import { StatusUnavailable } from "@/components/StatusUnavailable";
 import { UptimeBars, UptimeLegend } from "@/components/UptimeBars";
 import { formatDuration } from "@/lib/line";
@@ -112,6 +113,10 @@ export default async function Home() {
           )}
         </p>
       </header>
+
+      {data.lastCheckedAt !== null && (
+        <StaleNotice lastCheckedAt={data.lastCheckedAt} renderedAt={data.generatedAt} />
+      )}
 
       <div
         role="status"
