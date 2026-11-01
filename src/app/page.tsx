@@ -1,5 +1,6 @@
 import { LatencyChart } from "@/components/LatencyChart";
 import { RelativeTime } from "@/components/RelativeTime";
+import { StatusUnavailable } from "@/components/StatusUnavailable";
 import { UptimeBars, UptimeLegend } from "@/components/UptimeBars";
 import { formatDuration } from "@/lib/line";
 import { getStatusData, type IncidentView, type MonitorView } from "@/lib/status-data";
@@ -91,7 +92,9 @@ function IncidentRow({ i }: { i: IncidentView }) {
 }
 
 export default async function Home() {
-  const data = await getStatusData();
+  const result = await getStatusData();
+  if (!result.ok) return <StatusUnavailable />;
+  const data = result.data;
   const banner = BANNER[data.overall];
 
   return (

@@ -1,6 +1,7 @@
 import { cacheLife } from "next/cache";
 import { activeMonitors } from "@/config/monitors";
 import { connectDB } from "@/lib/db";
+import { errorLabel } from "@/lib/errors";
 import {
   dailyBuckets,
   latencySeries,
@@ -51,10 +52,26 @@ export type StatusData = {
   resolvedIncidents: IncidentView[];
 };
 
-export async function getStatusData(): Promise<StatusData> {
+/** `ok: false` means the database could not be read: not the same thing as "no checks yet". */
+export type StatusResult = { ok: true; data: StatusData } | { ok: false };
+
+/**
+ * The failure is returned, not thrown, so it is cached like any other result: the page shows an
+ * error for up to a minute and then tries again by itself.
+ */
+export async function getStatusData(): Promise<StatusResult> {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 3600 });
 
+  try {
+    return { ok: true, data: await loadStatusData() };
+  } catch (err) {
+    console.error(`status page: could not load data (${errorLabel(err)})`);
+    return { ok: false };
+  }
+}
+
+async function loadStatusData(): Promise<StatusData> {
   await connectDB();
   const now = Date.now();
   const ids = activeMonitors.map((m) => m.id);
