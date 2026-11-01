@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { connection } from "next/server";
 import { activeMonitors as monitors, type Monitor } from "@/config/monitors";
 import { connectDB } from "@/lib/db";
+import { errorLabel } from "@/lib/errors";
 import { runCheck, type CheckResult } from "@/lib/check";
 import { downMessage, pushLine, recoveredMessage } from "@/lib/line";
 import { nextState } from "@/lib/state";
@@ -54,6 +55,15 @@ async function checkAndTrack(monitor: Monitor, at: Date): Promise<CheckResult> {
   return result;
 }
 
+/**
+ * The scheduler only sees the status code, so a run that could not save its checks must not look
+ * like a success: it once answered 200 for two days while nothing reached the database. The body
+ * says nothing about why; the reason goes to the host's logs (see errorLabel).
+ */
+function failed(): Response {
+  return Response.json({ error: "Internal error" }, { status: 500, headers: { "Cache-Control": "no-store" } });
+}
+
 export async function GET(request: Request) {
   await connection(); // always request-time: never prerendered or cached
 
@@ -61,17 +71,25 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error(`cron: database unavailable (${errorLabel(err)})`);
+    return failed();
+  }
   const at = new Date();
 
+  // allSettled, not all: one monitor failing to save must not stop the others from being checked and saved.
   const settled = await Promise.allSettled(monitors.map((m) => checkAndTrack(m, at)));
 
-  const results = settled.map((s, i) => {
-    const base = { id: monitors[i].id };
-    if (s.status === "fulfilled") return { ...base, ...s.value };
-    console.error(`check failed for ${base.id}`);
-    return { ...base, ok: false, error: "internal error" };
+  let anyFailed = false;
+  const results = settled.flatMap((s, i) => {
+    if (s.status === "fulfilled") return [{ id: monitors[i].id, ...s.value }];
+    anyFailed = true;
+    console.error(`cron: could not save the check for ${monitors[i].id} (${errorLabel(s.reason)})`);
+    return [];
   });
+  if (anyFailed) return failed();
 
   return Response.json({ at, results }, { headers: { "Cache-Control": "no-store" } });
 }
