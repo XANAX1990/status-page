@@ -79,6 +79,8 @@ Trigger a check manually:
 curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron/check
 ```
 
+The scheduler only sees the status code, so the endpoint answers **200** only when every check was saved. If the database can't be reached or a check can't be saved it answers **500** with `{"error":"Internal error"}` and nothing else; the reason (the error's class name and code, never its message) is in the host's logs. If the database can't be read, the status page shows "Status data unavailable" instead of an empty page, and tries again within a minute.
+
 ### Environment variables
 
 | Name | Description |
